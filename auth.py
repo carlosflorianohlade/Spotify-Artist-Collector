@@ -52,6 +52,8 @@ def get_access_token() -> str:
             except Exception:
                 self.send_response(404)
                 self.end_headers()
+        def log_message(self, format, *args):
+            pass
 
     server = HTTPServer(('127.0.0.1', 3000), CallbackHandler)
     webbrowser.open(auth_url)
@@ -73,6 +75,4 @@ def get_access_token() -> str:
     access_token = token_data.get("access_token")
     refresh_token = token_data.get("refresh_token")
 
-    print(response.status_code)
-    print(token_data)
     return access_token
