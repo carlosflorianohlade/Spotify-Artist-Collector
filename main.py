@@ -1,5 +1,6 @@
 from auth import get_access_token
 import requests
+import time
 
 access_token = get_access_token()
 headers = {"Authorization": f"Bearer {access_token}"}
@@ -39,3 +40,30 @@ while True:
 
 id_artista = search_result[choice]
 
+url = f"https://api.spotify.com/v1/artists/{id_artista}/albums"
+params = {
+    "limit": 10,
+    "include_groups": "album,single,appears_on,compilation"
+}
+
+album_ids = set()
+
+while url:
+    response = requests.get(url, params=params, headers=headers)
+    if response.status_code == 429:
+        retry_after = int(response.headers.get('Retry-After', 5))
+        print(f"Rate limited, aspetto {retry_after} secondi...")
+        time.sleep(retry_after)
+        
+    data = response.json()
+    
+    for album in data["items"]:
+        album_ids.add(album["id"])
+        
+    
+    url = data["next"]
+    params = None
+    time.sleep(0.5)
+
+print(f"Totale ID unici: {len(album_ids)}")
+print(album_ids)
