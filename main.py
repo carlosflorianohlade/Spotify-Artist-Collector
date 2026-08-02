@@ -43,7 +43,7 @@ id_artista = search_result[choice]
 url = f"https://api.spotify.com/v1/artists/{id_artista}/albums"
 params = {
     "limit": 10,
-    "include_groups": "album,single,appears_on,compilation"
+    "include_groups": "album,single"
 }
 
 album_ids = set()
@@ -54,7 +54,7 @@ while url:
         retry_after = int(response.headers.get('Retry-After', 5))
         print(f"Rate limited, aspetto {retry_after} secondi...")
         time.sleep(retry_after)
-        
+
     data = response.json()
     
     for album in data["items"]:
