@@ -1,6 +1,7 @@
 from auth import get_access_token
 import requests
 import time
+import random
 
 access_token = get_access_token()
 headers = {"Authorization": f"Bearer {access_token}"}
@@ -46,24 +47,26 @@ params = {
     "include_groups": "album,single"
 }
 
-album_ids = set()
+response_ids = set()
 
 while url:
     response = requests.get(url, params=params, headers=headers)
     if response.status_code == 429:
+        print(response.json())
         retry_after = int(response.headers.get('Retry-After', 5))
         print(f"Rate limited, aspetto {retry_after} secondi...")
         time.sleep(retry_after)
+        continue
 
     data = response.json()
     
     for album in data["items"]:
-        album_ids.add(album["id"])
+        response_ids.add(album["id"])
         
     
     url = data["next"]
     params = None
-    time.sleep(0.5)
+    time.sleep(random.uniform(1.5, 3))
 
-print(f"Totale ID unici: {len(album_ids)}")
-print(album_ids)
+print(f"Totale ID unici: {len(response_ids)}")
+print(response_ids)
