@@ -70,19 +70,34 @@ if not file.exists():
         data = response.json()
 
         for album in data["items"]:
-            response_ids.add(album["id"])
+            album_id = album['id']
+            tracks_resp = requests.get(
+                f"https://api.spotify.com/v1/albums/{album_id}/tracks",
+                headers=headers,
+                params={"limit": 50}
+            )
+            tracks_data = tracks_resp.json()
 
-
+            for track in tracks_data["items"]:
+                response_ids.add(f"spotify:track:{track['id']}")
+            time.sleep(random.uniform(0.5, 1))
+        
         url = data["next"]
         params = None
         time.sleep(random.uniform(1.5, 3))
 
     print(f"Totale ID unici: {len(response_ids)}")
-    print(response_ids)
+    # print(response_ids)
 
-    with open(nome_artista, "w") as f:
-        f.write(str(response_ids))
+    with open(f"{nome_artista}.txt", "w") as f:
+        f.write(str(", ".join(response_ids)))
 
+else:
+    with open(f"{nome_artista}.txt", "r") as f:
+        contenuto = f.read()
+        response_ids = {x.strip() for x in contenuto.split(",")}
+        
+        
 
 
 response = requests.post(
@@ -93,7 +108,28 @@ response = requests.post(
 )
 
 playlist_id = response.json()['id']
+uris = list(response_ids)
 
-response = requests.post(
-    f"https://api.spotify.com/v1/playlists/{playlist_id}/items"
+def chunks(lst, n):
+    for i in range(0, len(lst), n):
+        yield lst[i:i+n]
+
+for batch in chunks(uris, 100):
+    while True:
+        response = requests.post(
+            f"https://api.spotify.com/v1/playlists/{playlist_id}/items",
+            headers=headers,
+            json={"uris": batch}
+        )
+        if response.status_code == 429:
+            retry_after = int(response.headers.get('Retry-After', 5))
+            print(f"Rate limited, aspetto {retry_after} secondi...")
+            time.sleep(retry_after)
+            continue
+        break
+    print(response.status_code)
+
+check = requests.get(
+    f"https://api.spotify.com/v1/playlists/{playlist_id}/items",
+    headers=headers
 )
