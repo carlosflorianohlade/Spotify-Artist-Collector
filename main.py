@@ -83,12 +83,17 @@ if not file.exists():
     with open(nome_artista, "w") as f:
         f.write(str(response_ids))
 
+
+
 response = requests.post(
-    "https://api.spotify.com/v1/me/playlists", headers=headers, data={
+    "https://api.spotify.com/v1/me/playlists", headers=headers, json={
         "name": nome_artista,
-        "description": f"Playlist of {nome_artista}",
-        "public": True ,
+        "public": True
     }   
 )
 
-print(response.status_code)
+playlist_id = response.json()['id']
+
+response = requests.post(
+    f"https://api.spotify.com/v1/playlists/{playlist_id}/items"
+)
