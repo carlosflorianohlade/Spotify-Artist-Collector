@@ -58,6 +58,8 @@ file = Path(nome_artista)
 if not file.exists():
     response_ids = set()
 
+    # TODO modificare il response_ids in un dictionary con "spotify:track:{track['id']}" : "nome_canzone" per poi controllare che gli id e nome siano tutti diversi
+
     while url:
         response = requests.get(url, params=params, headers=headers)
         if response.status_code == 429:
