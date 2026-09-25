@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Artist Collector</title>
+  <meta name="description" content="Build a Spotify playlist with every song of an artist.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%2315131f'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23f2b84b'/%3E%3C/svg%3E">
+</head>
+<body>
+  <header class="topbar">
+    <a class="wordmark" href="./">
+      <span class="disc" aria-hidden="true"></span>
+      Artist Collector
+    </a>
+    <div class="user" id="user" hidden>
+      <img id="user-avatar" alt="" width="28" height="28">
+      <span id="user-name"></span>
+      <button class="link" id="logout" type="button">Log out</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="alert" id="alert" role="alert" hidden>
+      <p id="alert-text"></p>
+      <button class="link" id="alert-close" type="button">Dismiss</button>
+    </div>
+
+    <!-- First run: no Client ID configured -->
+    <section class="screen" data-screen="setup" hidden>
+      <h1>Every song by one artist, in one playlist.</h1>
+      <p class="lead">To start, paste the Client ID of your Spotify app. You find it in the
+        <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noopener">Developer Dashboard</a>
+        under Settings. It is saved only in this browser.</p>
+      <form class="field-row" id="setup-form">
+        <label class="sr-only" for="client-id">Client ID</label>
+        <input id="client-id" name="clientId" placeholder="Client ID" autocomplete="off" spellcheck="false" required>
+        <button class="primary" type="submit">Save</button>
+      </form>
+      <p class="hint">The Dashboard must list this Redirect URI: <code id="redirect-uri"></code></p>
+    </section>
+
+    <!-- Logged out -->
+    <section class="screen" data-screen="login" hidden>
+      <h1>Every song by one artist, in one playlist.</h1>
+      <p class="lead">Pick an artist and this site reads all their albums and singles,
+        keeps each song once, and saves the playlist in your Spotify account.</p>
+      <button class="primary big" id="login" type="button">Log in with Spotify</button>
+      <p class="hint"><button class="link" id="change-client-id" type="button">Use a different Client ID</button></p>
+    </section>
+
+    <!-- Search and choose the artist -->
+    <section class="screen" data-screen="search" hidden>
+      <h1>Whose discography?</h1>
+      <form class="field-row" id="search-form" role="search">
+        <label class="sr-only" for="query">Artist name</label>
+        <input id="query" name="query" type="search" placeholder="Artist name" autocomplete="off" required>
+        <button class="primary" type="submit">Search</button>
+      </form>
+      <ul class="artists" id="artists" aria-live="polite"></ul>
+
+      <div class="cached" id="cached" hidden>
+        <p id="cached-text"></p>
+        <div class="actions">
+          <button class="primary" id="use-cache" type="button">Use the saved list</button>
+          <button class="secondary" id="refresh-cache" type="button">Download it again</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Downloading / building -->
+    <section class="screen" data-screen="working" hidden>
+      <h1 id="working-title"></h1>
+      <p class="status" id="status" aria-live="polite"></p>
+      <div class="progress" id="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <span id="progress-bar"></span>
+      </div>
+      <p class="counts" id="counts"></p>
+      <ol class="wall" id="wall" aria-label="Releases read so far"></ol>
+    </section>
+
+    <!-- Done -->
+    <section class="screen" data-screen="done" hidden>
+      <h1 id="done-title"></h1>
+      <p class="lead" id="done-text"></p>
+      <div class="actions">
+        <a class="primary big" id="open-playlist" target="_blank" rel="noopener">Open in Spotify</a>
+        <button class="secondary" id="again" type="button">Make another playlist</button>
+      </div>
+      <iframe class="embed" id="embed" title="Playlist player" loading="lazy"
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+      <p class="hint"><a id="download-list" download>Download the track list</a> (same format as the Python version’s <code>.txt</code> file).</p>
+    </section>
+  </main>
+
+  <dialog id="confirm-dialog">
+    <form method="dialog">
+      <h2 id="confirm-title"></h2>
+      <p id="confirm-text"></p>
+      <div class="actions">
+        <button class="primary" value="yes">Delete and rebuild</button>
+        <button class="secondary" value="no">Cancel</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

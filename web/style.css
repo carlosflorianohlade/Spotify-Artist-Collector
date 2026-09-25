@@ -1,0 +1,416 @@
+:root {
+  --bg: #15131f;
+  --surface: #211e2f;
+  --line: #35304b;
+  --text: #ede8f5;
+  --muted: #a39cb8;
+  --accent: #f2b84b;       /* fills: buttons, progress, the disc */
+  --accent-ink: #f2b84b;   /* accent used as text on --bg */
+  --on-accent: #2a1d05;
+  --danger-bg: #3a1c24;
+  --danger-line: #7a3445;
+
+  --display: "Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif;
+  --body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --measure: 42rem;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f4f2f8;
+    --surface: #ffffff;
+    --line: #dcd7e6;
+    --text: #1d1a28;
+    --muted: #5e5873;
+    --accent-ink: #8a5700;
+    --danger-bg: #fdecef;
+    --danger-line: #e7a3b1;
+    color-scheme: light;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--text);
+  font: 400 1.0625rem/1.55 var(--body);
+}
+
+[hidden] { display: none !important; }
+
+a { color: var(--accent-ink); text-underline-offset: 0.18em; }
+
+code {
+  font-size: 0.9em;
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  overflow-wrap: anywhere;
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+h1:focus { outline: none; }
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------ top bar */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  max-width: calc(var(--measure) + 2rem);
+  margin: 0 auto;
+  padding: 1.25rem 1rem;
+}
+
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--text);
+  font: 700 1.05rem/1 var(--display);
+  text-decoration: none;
+}
+
+/* A record: dark vinyl with the amber label. */
+.disc {
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, var(--bg) 0 8%, var(--accent) 9% 34%, transparent 35%),
+    repeating-radial-gradient(circle, #2c2840 0 1px, #1b1827 1px 3px);
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.95rem;
+  color: var(--muted);
+  min-width: 0;
+}
+.user img { border-radius: 50%; object-fit: cover; }
+#user-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 10rem;
+}
+
+/* ------------------------------------------------------------ layout */
+
+main {
+  max-width: calc(var(--measure) + 2rem);
+  margin: 0 auto;
+  padding: 2rem 1rem 5rem;
+}
+
+h1 {
+  margin: 0 0 1.25rem;
+  font: 760 clamp(2.5rem, 8vw, 4.6rem)/0.95 var(--display);
+  font-stretch: 80%;
+  font-variation-settings: "opsz" 96;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+h2 {
+  margin: 0 0 0.5rem;
+  font: 700 1.5rem/1.15 var(--display);
+}
+
+.lead {
+  max-width: 34em;
+  margin: 0 0 2rem;
+  color: var(--muted);
+  font-size: 1.15rem;
+}
+
+.hint {
+  margin: 1.5rem 0 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+/* ------------------------------------------------------------ controls */
+
+button, input { font: inherit; color: inherit; }
+
+.primary, .secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.9rem;
+  padding: 0 1.4rem;
+  border-radius: 999px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 120ms ease, background-color 120ms ease;
+}
+.primary {
+  border: 0;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.primary:hover { background: #f6c86c; }
+.primary:active { transform: scale(0.97); }
+.primary:disabled { opacity: 0.6; cursor: progress; }
+.primary.big { min-height: 3.4rem; padding: 0 1.9rem; font-size: 1.1rem; }
+
+.secondary {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+}
+.secondary:hover { background: var(--surface); }
+
+.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent-ink);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  cursor: pointer;
+}
+
+.field-row {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+}
+.field-row input {
+  flex: 1;
+  min-width: 0;
+  min-height: 3.4rem;
+  padding: 0 1.2rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 1.1rem;
+}
+.field-row input::placeholder { color: var(--muted); }
+.field-row input:focus-visible { outline-offset: 0; border-color: var(--accent); }
+.field-row .primary { min-height: 3.4rem; }
+
+/* ------------------------------------------------------------ alert */
+
+.alert {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  padding: 1rem 1.2rem;
+  border: 1px solid var(--danger-line);
+  border-radius: 12px;
+  background: var(--danger-bg);
+}
+.alert p { margin: 0; }
+.alert .link { flex-shrink: 0; color: var(--text); }
+
+/* ------------------------------------------------------------ artist results */
+
+.artists {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.artist {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.7rem;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+.artist:hover { background: var(--surface); }
+
+.portrait {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: var(--surface) center / cover no-repeat;
+  box-shadow: inset 0 0 0 1px var(--line);
+  font: 700 1.3rem/1 var(--display);
+  color: var(--muted);
+}
+
+.artist-text {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.6rem;
+  min-width: 0;
+}
+.artist-text strong {
+  font: 650 1.2rem/1.2 var(--display);
+}
+.artist-text .meta {
+  flex-basis: 100%;
+  color: var(--muted);
+  font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.badge {
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.empty {
+  padding: 1rem 0.7rem;
+  color: var(--muted);
+}
+
+.cached {
+  padding: 1.4rem;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+.cached p { margin: 0 0 1.2rem; }
+
+/* ------------------------------------------------------------ working */
+
+.status {
+  min-height: 1.55em;
+  margin: 0 0 1rem;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.progress {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line);
+  overflow: hidden;
+}
+.progress span {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--accent);
+  transition: width 300ms ease;
+}
+
+.counts {
+  margin: 0.75rem 0 2rem;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.95rem;
+}
+
+/* The wall of covers: the discography piling up as it is read. */
+.wall {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(4.5rem, 1fr));
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.wall li {
+  aspect-ratio: 1;
+  border-radius: 4px;
+  background: var(--surface);
+  overflow: hidden;
+  animation: drop-in 380ms cubic-bezier(0.2, 0.9, 0.3, 1.25) both;
+}
+.wall img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@keyframes drop-in {
+  from { opacity: 0; transform: translateY(-10px) scale(0.7) rotate(-4deg); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ------------------------------------------------------------ done */
+
+[data-screen="done"] .actions { margin-bottom: 2rem; }
+
+.embed {
+  display: block;
+  width: 100%;
+  height: 380px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+/* ------------------------------------------------------------ dialog */
+
+dialog {
+  width: min(28rem, calc(100vw - 2rem));
+  padding: 1.6rem;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--text);
+}
+dialog::backdrop { background: rgb(10 8 18 / 0.7); }
+dialog p { margin: 0 0 1.5rem; color: var(--muted); }
+
+/* ------------------------------------------------------------ small screens, motion */
+
+@media (max-width: 30rem) {
+  .field-row { flex-direction: column; }
+  .actions > * { flex: 1 1 100%; }
+  .embed { height: 352px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
