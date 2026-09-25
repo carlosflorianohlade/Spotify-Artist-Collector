@@ -27,8 +27,13 @@
   <main>
     <div class="alert" id="alert" role="alert" hidden>
       <p id="alert-text"></p>
-      <button class="link" id="alert-close" type="button">Dismiss</button>
+      <div class="alert-actions">
+        <button class="link" id="alert-retry" type="button" hidden>Try again</button>
+        <button class="link" id="alert-close" type="button">Dismiss</button>
+      </div>
     </div>
+
+    <p class="wait" id="wait" role="status" hidden></p>
 
     <!-- First run: no Client ID configured -->
     <section class="screen" data-screen="setup" hidden>
@@ -47,9 +52,32 @@
     <!-- Logged out -->
     <section class="screen" data-screen="login" hidden>
       <h1>Every song by one artist, in one playlist.</h1>
-      <p class="lead">Pick an artist and this site reads all their albums and singles,
-        keeps each song once, and saves the playlist in your Spotify account.</p>
+      <p class="lead">On Spotify an artist’s songs are spread across albums, singles and deluxe editions,
+        and there is no button to play them all. Artist Collector reads the whole discography
+        and saves every song in one playlist in your account. A song that appears on both a single
+        and an album, or again as a remaster, is added only once.</p>
       <button class="primary big" id="login" type="button">Log in with Spotify</button>
+      <p class="hint">Access is by invitation: the app is in Spotify’s development mode, so the
+        email of your Spotify account must be on the owner’s list.</p>
+
+      <section class="tracklist" aria-labelledby="how-title">
+        <h2 id="how-title">How it works</h2>
+        <ol>
+          <li><span class="side" aria-hidden="true">A1</span>
+            <div><strong>Log in with Spotify</strong>
+            <p>The site asks to read your playlists and to create new ones. No password passes through it.</p></div></li>
+          <li><span class="side" aria-hidden="true">A2</span>
+            <div><strong>Pick the artist</strong>
+            <p>Search by name and choose from the results.</p></div></li>
+          <li><span class="side" aria-hidden="true">A3</span>
+            <div><strong>The discography is read</strong>
+            <p>Every album and single, one release at a time. A long career can take a few minutes.</p></div></li>
+          <li><span class="side" aria-hidden="true">A4</span>
+            <div><strong>The playlist is saved</strong>
+            <p>It gets the artist’s name and appears in your library, ready to play or shuffle.</p></div></li>
+        </ol>
+      </section>
+
       <p class="hint"><button class="link" id="change-client-id" type="button">Use a different Client ID</button></p>
     </section>
 

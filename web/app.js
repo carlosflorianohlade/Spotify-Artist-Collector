@@ -132,11 +132,18 @@ class SpotifyError extends Error {
   }
 }
 
-/** Call the Spotify Web API, waiting and retrying when rate limited (429). */
+// Spotify does not let web pages read the Retry-After header (it is not in
+// Access-Control-Expose-Headers), so when rate limited the browser usually does not
+// know how long to wait: it tries these waits (seconds) and then gives up.
+const RATE_LIMIT_WAITS = [5, 15, 60];
+const MAX_WAIT = 120;  // a longer Retry-After means the app is blocked: stop instead of waiting
+
+/** Call the Spotify Web API, waiting and retrying a few times when rate limited (429). */
 async function spotify(method, url, { params, body } = {}) {
   if (!url.startsWith("http")) url = API + url;
   if (params) url += "?" + new URLSearchParams(params);
 
+  let attempt = 0;
   while (true) {
     const response = await fetch(url, {
       method,
@@ -148,9 +155,14 @@ async function spotify(method, url, { params, body } = {}) {
     });
 
     if (response.status === 429) {
-      const retryAfter = Number(response.headers.get("Retry-After")) || 5;
-      setStatus(`Spotify asked to slow down, waiting ${retryAfter} seconds…`);
-      await sleep(retryAfter * 1000);
+      const retryAfter = Number(response.headers.get("Retry-After")) || null;
+      const wait = retryAfter || RATE_LIMIT_WAITS[attempt++];
+      if (!wait || wait > MAX_WAIT) {
+        const error = new SpotifyError(429, "");
+        error.retryAfter = retryAfter;
+        throw error;
+      }
+      await waitWithCountdown(wait);
       continue;
     }
     if (!response.ok) {
@@ -275,7 +287,16 @@ function show(screen) {
   if (heading) { heading.tabIndex = -1; heading.focus({ preventScroll: true }); }
 }
 
-function showError(error) {
+let retryAction = null;
+
+function formatDuration(seconds) {
+  if (seconds < 90) return `${seconds} seconds`;
+  if (seconds < 90 * 60) return `${Math.round(seconds / 60)} minutes`;
+  return `${(seconds / 3600).toFixed(1)} hours`;
+}
+
+/** Show an error; with `retry`, the alert also gets a "Try again" button that runs it. */
+function showError(error, retry = null) {
   console.error(error);
   let message = error.message || String(error);
   if (error instanceof SpotifyError) {
@@ -286,16 +307,35 @@ function showError(error) {
       message = "Spotify refused the request (403). Check that your account is in the app’s User Management list "
         + "on the Developer Dashboard and that the app owner has Premium."
         + (error.message ? ` Spotify said: “${error.message}”.` : "");
+    } else if (error.status === 429) {
+      message = error.retryAfter
+        ? `Spotify is limiting this app: wait about ${formatDuration(error.retryAfter)}, then try again.`
+        : "Spotify is still limiting this app after a few tries. A limit like this can last from minutes "
+          + "to a few hours, and Spotify does not tell a web page how long. Try again later.";
     } else {
       message = `Spotify answered with error ${error.status}${error.message ? `: ${error.message}` : ""}.`;
     }
   }
   $("alert-text").textContent = message;
+  retryAction = retry;
+  $("alert-retry").hidden = !retry;
   $("alert").hidden = false;
 }
 
 function clearError() {
   $("alert").hidden = true;
+  retryAction = null;
+}
+
+/** Rate limited: wait, showing the seconds left (like the "waiting N seconds" print of main.py). */
+async function waitWithCountdown(seconds) {
+  const notice = $("wait");
+  notice.hidden = false;
+  for (let left = seconds; left > 0; left--) {
+    notice.textContent = `Spotify asked to slow down, waiting ${left} ${left === 1 ? "second" : "seconds"}…`;
+    await sleep(1000);
+  }
+  notice.hidden = true;
 }
 
 function setStatus(text) {
@@ -439,7 +479,7 @@ async function build(artist, useCache) {
     showDone(artist, playlistId, trackUris);
   } catch (error) {
     if (getToken()) show("search");
-    showError(error);
+    showError(error, () => build(artist, useCache));
   }
 }
 
@@ -484,6 +524,11 @@ $("change-client-id").addEventListener("click", () => {
 $("login").addEventListener("click", () => login().catch(showError));
 $("logout").addEventListener("click", logout);
 $("alert-close").addEventListener("click", clearError);
+$("alert-retry").addEventListener("click", () => {
+  const retry = retryAction;
+  clearError();
+  retry();
+});
 
 $("search-form").addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -494,7 +539,7 @@ $("search-form").addEventListener("submit", async (event) => {
   try {
     renderArtists(await searchArtists($("query").value.trim()));
   } catch (error) {
-    showError(error);
+    showError(error, () => $("search-form").requestSubmit());
   } finally {
     button.disabled = false;
   }
