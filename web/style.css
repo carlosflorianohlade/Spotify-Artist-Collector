@@ -123,7 +123,7 @@ h1:focus { outline: none; }
 main {
   max-width: calc(var(--measure) + 2rem);
   margin: 0 auto;
-  padding: 2rem 1rem 5rem;
+  padding: 2rem 1rem 4rem;
 }
 
 h1 {
@@ -432,6 +432,22 @@ button, input { font: inherit; color: inherit; }
   border-radius: 12px;
   background: var(--surface);
 }
+
+/* ------------------------------------------------------------ credits */
+
+.credits {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  max-width: calc(var(--measure) + 2rem);
+  margin: 0 auto;
+  padding: 1.5rem 1rem 2rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+.credits p { margin: 0; }
 
 /* ------------------------------------------------------------ dialog */
 

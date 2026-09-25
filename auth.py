@@ -58,8 +58,8 @@ def _code_challenge(verifier: str) -> str:
     return base64.urlsafe_b64encode(digest).decode("ascii").rstrip("=")
 
 
-def _wait_for_auth_code() -> str | None:
-    """Start a one-shot local server and return the ?code=... Spotify redirects to."""
+def _wait_for_auth_code(auth_url: str) -> str | None:
+    """Start a one-shot local server, open the login page and return the ?code=... Spotify redirects to."""
     result = {}
 
     class CallbackHandler(BaseHTTPRequestHandler):
@@ -80,7 +80,14 @@ def _wait_for_auth_code() -> str | None:
         def log_message(self, format, *args):
             pass
 
+    # Bind the server before opening the browser, otherwise a fast redirect
+    # from Spotify can hit 127.0.0.1 before anything is listening.
     server = HTTPServer((REDIRECT_HOST, REDIRECT_PORT), CallbackHandler)
+
+    print("Opening the Spotify login page in your browser...")
+    print(f"If it does not open, visit this URL:\n{auth_url}\n")
+    webbrowser.open(auth_url)
+
     while "code" not in result:
         server.handle_request()
     server.server_close()
@@ -106,11 +113,7 @@ def get_access_token() -> str | None:
         "redirect_uri": REDIRECT_URI,
     })
 
-    print("Opening the Spotify login page in your browser...")
-    print(f"If it does not open, visit this URL:\n{auth_url}\n")
-    webbrowser.open(auth_url)
-
-    auth_code = _wait_for_auth_code()
+    auth_code = _wait_for_auth_code(auth_url)
     if not auth_code:
         return None
 
