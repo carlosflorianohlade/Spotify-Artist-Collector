@@ -1,34 +1,27 @@
+/* Palette and type modelled on the Spotify web player, so the site reads as
+   a companion to it. Spotify's own typeface is proprietary; Figtree is the
+   closest free geometric match. */
 :root {
-  --bg: #15131f;
-  --surface: #211e2f;
-  --line: #35304b;
-  --text: #ede8f5;
-  --muted: #a39cb8;
-  --accent: #f2b84b;       /* fills: buttons, progress, the disc */
-  --accent-ink: #f2b84b;   /* accent used as text on --bg */
-  --on-accent: #2a1d05;
-  --danger-bg: #3a1c24;
-  --danger-line: #7a3445;
+  --page: #000000;         /* the black behind the panels */
+  --bg: #121212;           /* main panel */
+  --surface: #1f1f1f;      /* rows on hover, cards */
+  --elevated: #282828;     /* inputs, dialog, placeholders */
+  --line: #333333;
+  --text: #ffffff;
+  --muted: #b3b3b3;
+  --accent: #1ed760;       /* Spotify green: fills */
+  --accent-hover: #3be477;
+  --accent-ink: #1ed760;   /* green used as text on --bg */
+  --on-accent: #000000;
+  --panel-green: #1e5534;  /* flat green of the main panel */
+  --danger-bg: #3b1219;
+  --danger-line: #e91429;
 
-  --display: "Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif;
-  --body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font: "Figtree", "Circular", "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
 
   --measure: 42rem;
+  --panel-pad: 2rem;
   color-scheme: dark;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg: #f4f2f8;
-    --surface: #ffffff;
-    --line: #dcd7e6;
-    --text: #1d1a28;
-    --muted: #5e5873;
-    --accent-ink: #8a5700;
-    --danger-bg: #fdecef;
-    --danger-line: #e7a3b1;
-    color-scheme: light;
-  }
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -36,28 +29,33 @@
 html { -webkit-text-size-adjust: 100%; }
 
 body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   margin: 0;
+  padding: 8px;
   min-height: 100dvh;
-  background: var(--bg);
+  background: var(--page);
   color: var(--text);
-  font: 400 1.0625rem/1.55 var(--body);
+  font: 400 1rem/1.5 var(--font);
+  -webkit-font-smoothing: antialiased;
 }
 
 [hidden] { display: none !important; }
 
-a { color: var(--accent-ink); text-underline-offset: 0.18em; }
+a { color: var(--text); font-weight: 600; text-underline-offset: 0.18em; }
+a:hover { color: var(--accent-ink); }
 
 code {
   font-size: 0.9em;
-  padding: 0.1em 0.35em;
+  padding: 0.1em 0.4em;
   border-radius: 4px;
-  background: var(--surface);
-  border: 1px solid var(--line);
+  background: var(--elevated);
   overflow-wrap: anywhere;
 }
 
 :focus-visible {
-  outline: 3px solid var(--accent);
+  outline: 3px solid var(--text);
   outline-offset: 3px;
 }
 h1:focus { outline: none; }
@@ -72,14 +70,20 @@ h1:focus { outline: none; }
 
 /* ------------------------------------------------------------ top bar */
 
+.topbar,
+main,
+.credits {
+  width: 100%;
+  max-width: calc(var(--measure) + 2 * var(--panel-pad));
+  margin: 0 auto;
+}
+
 .topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  max-width: calc(var(--measure) + 2rem);
-  margin: 0 auto;
-  padding: 1.25rem 1rem;
+  padding: 0.75rem 0.5rem;
 }
 
 .wordmark {
@@ -87,30 +91,52 @@ h1:focus { outline: none; }
   align-items: center;
   gap: 0.6rem;
   color: var(--text);
-  font: 700 1.05rem/1 var(--display);
+  font: 800 1.1rem/1 var(--font);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
   text-decoration: none;
 }
+.wordmark:hover { color: var(--text); }
 
-/* A record: dark vinyl with the amber label. */
+/* A record: black vinyl with a green label. */
 .disc {
-  width: 1.6rem;
-  height: 1.6rem;
+  width: 2rem;
+  height: 2rem;
   border-radius: 50%;
   background:
-    radial-gradient(circle, var(--bg) 0 8%, var(--accent) 9% 34%, transparent 35%),
-    repeating-radial-gradient(circle, #2c2840 0 1px, #1b1827 1px 3px);
-  box-shadow: 0 0 0 1px var(--line);
+    radial-gradient(circle, var(--page) 0 8%, var(--accent) 9% 34%, transparent 35%),
+    repeating-radial-gradient(circle, #2a2a2a 0 1px, #121212 1px 3px);
 }
 
 .user {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  font-size: 0.95rem;
-  color: var(--muted);
+  gap: 1rem;
   min-width: 0;
+  font-size: 0.875rem;
+  font-weight: 700;
 }
-.user img { border-radius: 50%; object-fit: cover; }
+
+/* The account chip from the player's top bar: avatar and name in a pill. */
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  height: 2rem;
+  padding: 2px 0.9rem 2px 2px;
+  border-radius: 999px;
+  background: var(--elevated);
+}
+.profile img {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #535353;
+}
+.profile:has(img[hidden]) { padding-left: 0.9rem; }
 #user-name {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -118,39 +144,58 @@ h1:focus { outline: none; }
   max-width: 10rem;
 }
 
+.logout {
+  flex-shrink: 0;
+  padding: 0.35rem 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 100ms ease, transform 100ms ease;
+}
+.logout:hover { color: var(--text); transform: scale(1.04); }
+
 /* ------------------------------------------------------------ layout */
 
+/* The main panel: a rounded sheet in flat green. Greys would look muddy on
+   it, so the surfaces inside are dark or light veils over the green. */
 main {
-  max-width: calc(var(--measure) + 2rem);
-  margin: 0 auto;
-  padding: 2rem 1rem 4rem;
+  --surface: rgb(0 0 0 / 0.2);
+  --elevated: rgb(0 0 0 / 0.3);
+  --line: rgb(255 255 255 / 0.2);
+  --muted: #c4dccd;
+  flex: 1;
+  padding: 2.5rem var(--panel-pad) 3.5rem;
+  border-radius: 8px;
+  background: var(--panel-green);
 }
 
 h1 {
   margin: 0 0 1.25rem;
-  font: 760 clamp(2.5rem, 8vw, 4.6rem)/0.95 var(--display);
-  font-stretch: 80%;
-  font-variation-settings: "opsz" 96;
-  letter-spacing: -0.02em;
+  font: 900 clamp(2.4rem, 7.5vw, 4.5rem)/1 var(--font);
+  letter-spacing: -0.04em;
   text-wrap: balance;
 }
 
 h2 {
   margin: 0 0 0.5rem;
-  font: 700 1.5rem/1.15 var(--display);
+  font: 700 1.5rem/1.2 var(--font);
+  letter-spacing: -0.02em;
 }
 
 .lead {
   max-width: 34em;
   margin: 0 0 2rem;
   color: var(--muted);
-  font-size: 1.15rem;
+  font-size: 1.05rem;
 }
 
 .hint {
   margin: 1.5rem 0 0;
   color: var(--muted);
-  font-size: 0.95rem;
+  font-size: 0.875rem;
 }
 
 .actions {
@@ -168,69 +213,79 @@ button, input { font: inherit; color: inherit; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 2.9rem;
-  padding: 0 1.4rem;
+  min-height: 3rem;
+  padding: 0 2rem;
   border-radius: 999px;
-  font-weight: 600;
+  font-weight: 700;
   text-decoration: none;
   cursor: pointer;
-  transition: transform 120ms ease, background-color 120ms ease;
+  transition: transform 100ms ease, background-color 100ms ease, border-color 100ms ease;
 }
+.primary:hover, .secondary:hover { transform: scale(1.04); }
+.primary:active, .secondary:active { transform: scale(0.98); }
+
 .primary {
   border: 0;
   background: var(--accent);
   color: var(--on-accent);
 }
-.primary:hover { background: #f6c86c; }
-.primary:active { transform: scale(0.97); }
-.primary:disabled { opacity: 0.6; cursor: progress; }
-.primary.big { min-height: 3.4rem; padding: 0 1.9rem; font-size: 1.1rem; }
+.primary:hover { background: var(--accent-hover); color: var(--on-accent); }
+.primary:disabled { opacity: 0.6; cursor: progress; transform: none; }
+.primary.big { min-height: 3.5rem; padding: 0 2.5rem; font-size: 1.05rem; }
 
 .secondary {
-  border: 1px solid var(--line);
+  border: 1px solid rgb(255 255 255 / 0.5);
   background: transparent;
   color: var(--text);
 }
-.secondary:hover { background: var(--surface); }
+.secondary:hover { border-color: var(--text); }
 
 .link {
   padding: 0;
   border: 0;
   background: none;
-  color: var(--accent-ink);
+  color: var(--text);
+  font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 0.18em;
   cursor: pointer;
 }
+.link:hover { color: var(--accent-ink); }
 
+/* Search field shaped like the player's search box. */
 .field-row {
   display: flex;
-  gap: 0.6rem;
+  gap: 0.75rem;
   margin-bottom: 1.5rem;
 }
 .field-row input {
   flex: 1;
   min-width: 0;
-  min-height: 3.4rem;
-  padding: 0 1.2rem;
-  border: 1px solid var(--line);
+  min-height: 3rem;
+  padding: 0 1.25rem;
+  border: 0;
   border-radius: 999px;
-  background: var(--surface);
-  font-size: 1.1rem;
+  background: var(--elevated);
+  box-shadow: inset 0 0 0 1px transparent;
+  font-size: 1rem;
+  transition: box-shadow 100ms ease, background-color 100ms ease;
 }
+.field-row input:hover { background: rgb(0 0 0 / 0.4); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.3); }
+.field-row input:focus-visible { outline: 0; box-shadow: inset 0 0 0 2px var(--text); }
 .field-row input::placeholder { color: var(--muted); }
-.field-row input:focus-visible { outline-offset: 0; border-color: var(--accent); }
-.field-row .primary { min-height: 3.4rem; }
+.field-row .primary { min-height: 3rem; }
 
 /* ------------------------------------------------------------ how it works */
 
-/* Printed like the tracklist on the back of a record sleeve. */
+/* Laid out like a playlist's track list: number, title, one-line detail. */
 .tracklist {
   margin: 3.5rem 0 0;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--line);
 }
-.tracklist h2 { margin-bottom: 1rem; }
+.tracklist h2 {
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--line);
+}
 .tracklist ol {
   margin: 0;
   padding: 0;
@@ -238,24 +293,26 @@ button, input { font: inherit; color: inherit; }
 }
 .tracklist li {
   display: grid;
-  grid-template-columns: 3rem 1fr;
-  gap: 0.25rem 1rem;
-  padding: 1rem 0;
-  border-bottom: 1px dashed var(--line);
+  grid-template-columns: 2rem 1fr;
+  gap: 1rem;
+  padding: 0.6rem 1rem 0.6rem 0.5rem;
+  border-radius: 4px;
 }
-.tracklist li:last-child { border-bottom: 0; }
+.tracklist li:hover { background: var(--surface); }
+.tracklist li:hover .side { color: var(--accent-ink); }
 .tracklist .side {
-  color: var(--accent-ink);
-  font: 700 1.35rem/1.2 var(--display);
-  font-stretch: 80%;
+  justify-self: end;
+  color: var(--muted);
+  font: 400 1rem/1.5rem var(--font);
   font-variant-numeric: tabular-nums;
 }
 .tracklist strong {
-  font: 650 1.15rem/1.3 var(--display);
+  font: 500 1rem/1.5rem var(--font);
 }
 .tracklist p {
-  margin: 0.2rem 0 0;
+  margin: 0;
   color: var(--muted);
+  font-size: 0.875rem;
 }
 
 /* ------------------------------------------------------------ alert */
@@ -267,19 +324,19 @@ button, input { font: inherit; color: inherit; }
   justify-content: space-between;
   margin-bottom: 2rem;
   padding: 1rem 1.2rem;
-  border: 1px solid var(--danger-line);
-  border-radius: 12px;
+  border-left: 4px solid var(--danger-line);
+  border-radius: 4px;
   background: var(--danger-bg);
 }
 .alert p { margin: 0; }
-.alert .link { flex-shrink: 0; color: var(--text); }
+.alert .link { flex-shrink: 0; }
 .alert-actions { display: flex; flex-shrink: 0; gap: 1rem; }
 
 /* ------------------------------------------------------------ artist results */
 
 .artists {
   list-style: none;
-  margin: 0;
+  margin: 0 -0.5rem;
   padding: 0;
 }
 
@@ -288,9 +345,9 @@ button, input { font: inherit; color: inherit; }
   align-items: center;
   gap: 1rem;
   width: 100%;
-  padding: 0.7rem;
+  padding: 0.5rem;
   border: 0;
-  border-radius: 12px;
+  border-radius: 6px;
   background: none;
   text-align: left;
   cursor: pointer;
@@ -304,66 +361,66 @@ button, input { font: inherit; color: inherit; }
   width: 3.5rem;
   height: 3.5rem;
   border-radius: 50%;
-  background: var(--surface) center / cover no-repeat;
-  box-shadow: inset 0 0 0 1px var(--line);
-  font: 700 1.3rem/1 var(--display);
+  background: var(--elevated) center / cover no-repeat;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.5);
+  font: 700 1.3rem/1 var(--font);
   color: var(--muted);
 }
 
 .artist-text {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
   column-gap: 0.6rem;
   min-width: 0;
 }
 .artist-text strong {
-  font: 650 1.2rem/1.2 var(--display);
+  font: 700 1.05rem/1.4 var(--font);
 }
 .artist-text .meta {
+  order: 2;
   flex-basis: 100%;
   color: var(--muted);
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .badge {
-  padding: 0.1rem 0.55rem;
+  padding: 0.1rem 0.5rem;
   border-radius: 999px;
   background: var(--accent);
   color: var(--on-accent);
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.7rem;
+  font-weight: 700;
 }
 
 .empty {
-  padding: 1rem 0.7rem;
+  padding: 1rem 0.5rem;
   color: var(--muted);
 }
 
 .cached {
-  padding: 1.4rem;
-  border: 1px solid var(--line);
-  border-radius: 16px;
+  padding: 1.25rem;
+  border-radius: 8px;
   background: var(--surface);
 }
+.cached p { margin: 0 0 1.2rem; }
+
 .wait {
   margin: 0 0 2rem;
   padding: 1rem 1.2rem;
-  border: 1px solid var(--accent);
-  border-radius: 12px;
-  color: var(--accent-ink);
+  border-left: 4px solid var(--accent);
+  border-radius: 4px;
+  background: var(--surface);
   font-variant-numeric: tabular-nums;
 }
-
-.cached p { margin: 0 0 1.2rem; }
 
 /* ------------------------------------------------------------ working */
 
 .status {
-  min-height: 1.55em;
+  min-height: 1.5em;
   margin: 0 0 1rem;
   color: var(--muted);
   overflow: hidden;
@@ -371,32 +428,34 @@ button, input { font: inherit; color: inherit; }
   white-space: nowrap;
 }
 
+/* The player's playback bar: thin grey track, fill that turns green. */
 .progress {
-  height: 6px;
+  height: 4px;
   border-radius: 999px;
-  background: var(--surface);
-  box-shadow: inset 0 0 0 1px var(--line);
+  background: #4d4d4d;
   overflow: hidden;
 }
 .progress span {
   display: block;
   width: 0;
   height: 100%;
+  border-radius: inherit;
   background: var(--accent);
   transition: width 300ms ease;
 }
 
 .counts {
   margin: 0.75rem 0 2rem;
+  color: var(--muted);
   font-variant-numeric: tabular-nums;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
 }
 
 /* The wall of covers: the discography piling up as it is read. */
 .wall {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(4.5rem, 1fr));
-  gap: 6px;
+  gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -404,7 +463,8 @@ button, input { font: inherit; color: inherit; }
 .wall li {
   aspect-ratio: 1;
   border-radius: 4px;
-  background: var(--surface);
+  background: var(--elevated);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.5);
   overflow: hidden;
   animation: drop-in 380ms cubic-bezier(0.2, 0.9, 0.3, 1.25) both;
 }
@@ -416,7 +476,7 @@ button, input { font: inherit; color: inherit; }
 }
 
 @keyframes drop-in {
-  from { opacity: 0; transform: translateY(-10px) scale(0.7) rotate(-4deg); }
+  from { opacity: 0; transform: translateY(-10px) scale(0.7); }
   to   { opacity: 1; transform: none; }
 }
 
@@ -430,7 +490,7 @@ button, input { font: inherit; color: inherit; }
   height: 380px;
   border: 0;
   border-radius: 12px;
-  background: var(--surface);
+  background: var(--elevated);
 }
 
 /* ------------------------------------------------------------ credits */
@@ -440,12 +500,11 @@ button, input { font: inherit; color: inherit; }
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 0.5rem 1.5rem;
-  max-width: calc(var(--measure) + 2rem);
-  margin: 0 auto;
-  padding: 1.5rem 1rem 2rem;
-  border-top: 1px solid var(--line);
+  padding: 1.25rem var(--panel-pad) 1.5rem;
+  border-radius: 8px;
+  background: var(--bg);
   color: var(--muted);
-  font-size: 0.95rem;
+  font-size: 0.875rem;
 }
 .credits p { margin: 0; }
 
@@ -453,18 +512,26 @@ button, input { font: inherit; color: inherit; }
 
 dialog {
   width: min(28rem, calc(100vw - 2rem));
-  padding: 1.6rem;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  background: var(--surface);
+  padding: 1.75rem;
+  border: 0;
+  border-radius: 8px;
+  background: var(--elevated);
   color: var(--text);
+  box-shadow: 0 16px 24px rgb(0 0 0 / 0.5);
 }
-dialog::backdrop { background: rgb(10 8 18 / 0.7); }
+dialog::backdrop { background: rgb(0 0 0 / 0.7); }
 dialog p { margin: 0 0 1.5rem; color: var(--muted); }
 
 /* ------------------------------------------------------------ small screens, motion */
 
 @media (max-width: 30rem) {
+  :root { --panel-pad: 1rem; }
+  body { padding: 0; gap: 0; }
+  main, .credits { border-radius: 0; }
+  .topbar { padding: 0.75rem 1rem; }
+  /* Only the avatar on phones, like the player's mobile header. */
+  .profile:has(img:not([hidden])) { padding-right: 2px; }
+  .profile:has(img:not([hidden])) #user-name { display: none; }
   .field-row { flex-direction: column; }
   .actions > * { flex: 1 1 100%; }
   .embed { height: 352px; }
